@@ -1,23 +1,69 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
-    <title>Desert Sandbox VR</title>
+    <title>Pizza VR - Physics Lab</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-super-hands-component@3.0.4/dist/aframe-super-hands.min.js"></script>
   </head>
   <body>
-    <a-scene>
-      <a-entity environment="preset: egypt; dressingAmount: 10"></a-entity>
-
-      <a-box position="0 0.5 -1.5" width="2" height="1" depth="1" color="#5D2906"></a-box>
+    <a-scene background="color: #87CEEB" renderer="antialias: true; precision: medium;">
       
-      <a-box position="0 1.1 -1.5" width="0.3" height="0.1" depth="0.5" color="red"></a-box>
+      <a-light type="ambient" intensity="0.7"></a-light>
+      <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
 
       <a-entity id="rig">
         <a-camera position="0 1.6 0"></a-camera>
-        <a-entity hand-controls="hand: left; handModelStyle: lowPoly; color: #111"></a-entity>
-        <a-entity hand-controls="hand: right; handModelStyle: lowPoly; color: #111"></a-entity>
+        
+        <a-entity id="rHand" 
+                  hand-controls="hand: right; handModelStyle: highPoly; color: #ffdbac"
+                  sphere-collider="objects: .grabbable" 
+                  super-hands="grabStartButtons: gripdown, triggerdown; grabEndButtons: gripup, triggerup">
+          <a-entity shell-outline></a-entity>
+        </a-entity>
+
+        <a-entity id="lHand" 
+                  hand-controls="hand: left; handModelStyle: highPoly; color: #ffdbac"
+                  sphere-collider="objects: .grabbable" 
+                  super-hands="grabStartButtons: gripdown, triggerdown; grabEndButtons: gripup, triggerup">
+          <a-entity shell-outline></a-entity>
+        </a-entity>
       </a-entity>
+
+      <a-plane position="0 0 0" rotation="-90 0 0" width="30" height="30" color="#7CFC00"></a-plane>
+      
+      <a-box position="0 0.8 -1" width="1.5" height="0.1" depth="1" color="#5C4033">
+        <a-box position="0 0 0" width="1.55" height="0.12" depth="1.05" color="black" material="side: back"></a-box>
+      </a-box>
+
+      <a-cylinder class="grabbable" 
+                  hoverable grabbable
+                  position="0 0.9 -1" 
+                  radius="0.3" height="0.05" 
+                  color="#F5DEB3">
+      </a-cylinder>
+
     </a-scene>
+
+    <script>
+      // Optimized Toon Outline Component
+      AFRAME.registerComponent('shell-outline', {
+        init: function () {
+          this.el.addEventListener('model-loaded', () => {
+            const mesh = this.el.getObject3D('mesh');
+            if (!mesh) return;
+            mesh.traverse((node) => {
+              if (node.isMesh) {
+                const outlineMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide });
+                const outlineMesh = node.clone();
+                outlineMesh.material = outlineMaterial;
+                outlineMesh.scale.multiplyScalar(1.05);
+                node.add(outlineMesh);
+              }
+            });
+          });
+        }
+      });
+    </script>
   </body>
 </html>
